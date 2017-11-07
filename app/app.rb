@@ -11,6 +11,10 @@ class Test
   def buttonClick
     self.title = "Clicked!"
   end
+
+  def doubleClick
+    self.title = "DOUBLE clicked!"
+  end
 end
 
 # Start silica

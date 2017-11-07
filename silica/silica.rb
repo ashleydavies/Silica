@@ -11,6 +11,8 @@ class Class
 end
 
 class Silica
+  Events = [:click, :dblclick, :mouseenter, :mouseleave, :keypress, :keydown, :keyup, :submit, :change, :focus, :blur, :load, :resize, :scroll, :unload]
+
   def self.start()
     Silica.new.init
   end
@@ -42,9 +44,11 @@ class Silica
 
       app.init
 
-      (element.find '[silica-on-click]').each do |button|
-        button.on :click do
-          app.send button.attr('silica-on-click')
+      Events.each do |event|
+        (element.find "[silica-on-#{event}]").each do |button|
+          button.on event do
+            app.send button.attr("silica-on-#{event}")
+          end
         end
       end
     end

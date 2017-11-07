@@ -33,13 +33,14 @@ class Silica
   end
 
   def init
-    Element['[silica-app]'].each do |element|
-      app_name = element.attr 'silica-app'
+    findElements(Element, 'app').each do |found|
+      element = found[:element]
+      app_name = found[:value]
       app = (Object.const_get (app_name)).new
 
-      (element.find '[silica-text-bind]').each do |textElement|
-        Silica.subscribe(app_name, textElement.attr('silica-text-bind')) do |t|
-          textElement.text = app.send(textElement.attr 'silica-text-bind')
+      findElements(element, 'text-bind').each do |found|
+        Silica.subscribe(app_name, found[:value]) do |t|
+          found[:element].text = app.send found[:value]
         end
       end
 
@@ -64,7 +65,9 @@ class Silica
         foundAttribute = "#{prefix}-#{attribute}"
         (element.find "[#{foundAttribute}]").each do |foundElement|
           puts "Found #{foundAttribute}"
-          elements.push({ :element => foundElement, :attribute => foundAttribute })
+          elements.push({ :element   => foundElement,
+                          :attribute => foundAttribute,
+                          :value     => foundElement.attr(foundAttribute) })
         end
       end
     end

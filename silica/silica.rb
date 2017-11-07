@@ -12,6 +12,7 @@ end
 
 class Silica
   Events = [:click, :dblclick, :mouseenter, :mouseleave, :keypress, :keydown, :keyup, :submit, :change, :focus, :blur, :load, :resize, :scroll, :unload]
+  Prefixes = [:silica, :sc]
 
   def self.start()
     Silica.new.init
@@ -45,13 +46,30 @@ class Silica
       app.init
 
       Events.each do |event|
-        (element.find "[silica-on-#{event}]").each do |button|
-          button.on event do
-            app.send button.attr("silica-on-#{event}")
+        (findElements element, [event, "on-#{event}"]).each do |found|
+          found[:element].on event do
+            app.send(found[:element].attr found[:attribute])
           end
         end
       end
     end
+  end
+
+  def findElements(element, attributes)
+    attributes = [attributes] if attributes.is_a? String
+    elements = []
+    
+    attributes.each do |attribute|
+      Prefixes.each do |prefix|
+        foundAttribute = "#{prefix}-#{attribute}"
+        (element.find "[#{foundAttribute}]").each do |foundElement|
+          puts "Found #{foundAttribute}"
+          elements.push({ :element => foundElement, :attribute => foundAttribute })
+        end
+      end
+    end
+    
+    elements
   end
 end
 

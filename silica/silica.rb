@@ -11,7 +11,7 @@ class Class
 end
 
 class Silica
-  Events = [:click, :dblclick, :mouseenter, :mouseleave, :keypress, :keydown, :keyup, :submit, :change, :focus, :blur, :load, :resize, :scroll, :unload]
+  Events = [:click, :dblclick, :mouseenter, :mouseleave, :keypress, :keydown, :keyup, :submit, :change, :focus, :blur, :load, :resize, :scroll, :unload, :input]
   Prefixes = [:silica, :sc]
 
   def self.start()
@@ -22,14 +22,17 @@ class Silica
   def self.notify(clazz, instance, attr) 
     if @@subscribed.has_key? clazz.to_s
       if @@subscribed[clazz.to_s].has_key? attr
-        @@subscribed[clazz.to_s][attr].call(instance.send attr)
+        @@subscribed[clazz.to_s][attr].each do |block|
+          block.call(instance.send attr)
+        end
       end
     end
   end
 
   def self.subscribe(className, attr, &callback)    
     @@subscribed[className] = {} unless @@subscribed.has_key? className
-    @@subscribed[className][attr] = callback;
+    @@subscribed[className][attr] = [] unless @@subscribed[className].has_key? attr
+    @@subscribed[className][attr].push callback;
   end
 
   def init
@@ -41,6 +44,19 @@ class Silica
       findElements(element, 'text-bind').each do |found|
         Silica.subscribe(app_name, found[:value]) do |t|
           found[:element].text = app.send found[:value]
+        end
+      end
+
+      findElements(element, 'model').each do |found|
+        lastValue = nil
+        Silica.subscribe(app_name, found[:value]) do |t|
+          found[:element].value = app.send found[:value]
+        end
+        found[:element].on :input do
+          return if lastValue == found[:element].value
+          puts "Sending"
+          app.send "#{found[:value]}=", found[:element].value
+          lastValue = found[:element].value
         end
       end
 
@@ -64,7 +80,6 @@ class Silica
       Prefixes.each do |prefix|
         foundAttribute = "#{prefix}-#{attribute}"
         (element.find "[#{foundAttribute}]").each do |foundElement|
-          puts "Found #{foundAttribute}"
           elements.push({ :element   => foundElement,
                           :attribute => foundAttribute,
                           :value     => foundElement.attr(foundAttribute) })

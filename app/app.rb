@@ -2,9 +2,11 @@ require 'opal-jquery'
 
 class Test
   silica_binding :title
+  silica_binding :entry
 
   def init
     self.title = "Initial title"
+    self.entry = "Eggs"
     puts "Initialized test app"
   end
   
@@ -13,7 +15,7 @@ class Test
   end
 
   def doubleClick
-    self.title = "DOUBLE clicked!"
+    self.entry = "Wow you double clicked a button!"
   end
 end
 

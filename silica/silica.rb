@@ -19,7 +19,10 @@ class Silica
   end
 
   @@subscribed = {}
+  @@dependency = []
+
   def self.notify(clazz, instance, attr) 
+    @@dependency.push 
     if @@subscribed.has_key? clazz.to_s
       if @@subscribed[clazz.to_s].has_key? attr
         @@subscribed[clazz.to_s][attr].each do |block|
@@ -62,7 +65,8 @@ class Silica
       app.init
 
       (findElements element, "show").each do |found|
-        puts app.instance_eval found[:value]
+        # Calculate dependencies
+        app.instance_eval found[:value]
       end
 
       Events.each do |event|

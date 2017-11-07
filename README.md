@@ -8,8 +8,8 @@ Example code:
 index.html:
 ```
 <div silica-app="AppClass">
-  <h1 silica-text-bind="count"></h1>
-  <button silica-on-click="increment">++</button>
+  <h1 sc-text-bind="count"></h1>
+  <button sc-click="increment">++</button>
 </div>
 ```
 
@@ -29,3 +29,16 @@ end
 ```
 
 The binding is handled behind the scenes, with changes being immediately reflected in the document as one would expect.
+
+You can achieve two-way data binding additionally by setting `sc-model="<bound attribute>"` on a text input field.
+  
+Most events are available, including `sc-click`, `sc-mousedown`, `sc-mouseenter`, etc. Named after jQuery's.
+
+If you prefer being more verbose, the following are all equivalent:
+
+```
+sc-click
+sc-on-click
+silica-click
+silica-on-click
+```

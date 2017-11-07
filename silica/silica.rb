@@ -54,13 +54,16 @@ class Silica
         end
         found[:element].on :input do
           return if lastValue == found[:element].value
-          puts "Sending"
           app.send "#{found[:value]}=", found[:element].value
           lastValue = found[:element].value
         end
       end
 
       app.init
+
+      (findElements element, "show").each do |found|
+        puts app.instance_eval found[:value]
+      end
 
       Events.each do |event|
         (findElements element, [event, "on-#{event}"]).each do |found|

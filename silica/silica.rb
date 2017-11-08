@@ -22,13 +22,19 @@ class Silica
   @@dependencies = nil
 
   def self.notify(clazz, instance, attr) 
+    queue = []
+
     if @@subscribed.has_key? clazz.to_s
       if @@subscribed[clazz.to_s].has_key? attr
         @@subscribed[clazz.to_s][attr].each do |block|
-          block.call(instance.send attr)
+          ret = block.call(instance.send attr)
+          queue << ret if ret.respond_to? :call
         end
       end
     end
+
+    queue.each(&:call)
+    queue.clear
   end
 
   def self.notify_read(clazz, instance, attr)
@@ -40,6 +46,7 @@ class Silica
     @@subscribed[className] = {}       unless @@subscribed.has_key? className
     @@subscribed[className][attr] = [] unless @@subscribed[className].has_key? attr
     @@subscribed[className][attr].push callback;
+    callback
   end
 
   def self.monitor_dependencies(&block)
@@ -78,14 +85,9 @@ class Silica
       app.init
 
       (findElements element, "show").each do |found|
-        puts ":)"
-        # Calculate dependencies
-        dependencies = Silica.monitor_dependencies do
-          puts "Monitor dependencies"
-          app.instance_eval found[:value]
+        subscribeTo app, found do |show|
+          found[:element].css 'display', show ? '' : 'none'
         end
-        
-        puts dependencies
       end
 
       Events.each do |event|
@@ -95,6 +97,33 @@ class Silica
           end
         end
       end
+    end
+  end
+  
+  def subscribeTo(app, elemFound, &block)
+    subscribedTo = []
+    result = nil
+
+    dependencies = Silica.monitor_dependencies do
+      result = app.instance_eval elemFound[:value]
+    end
+
+    block.call result
+
+    dependencies.each do |dependency|
+      subscribedTo << {
+        :class => dependency[:class],
+        :attribute => dependency[:attribute],
+        :callback => Silica.subscribe(dependency[:class].to_s, dependency[:attribute]) do
+          -> {
+            subscribedTo.each do |subscription|
+              @@subscribed[subscription[:class].to_s][subscription[:attribute]] -= [subscription[:callback]]
+            end
+
+            subscribeTo(app, elemFound, &block)
+          }
+        end
+      }
     end
   end
 

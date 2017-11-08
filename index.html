@@ -18,7 +18,7 @@
         <section sc-app="BasicDemo" class="card">
           <div class="card-content">
             <span class="card-title" sc-text-bind="title"></span>
-            <button sc-click="buttonClick" sc-dblclick="doubleClick">Click me to change title</button>
+            <button class="waves-effect btn" sc-click="buttonClick" sc-dblclick="doubleClick">Click me to change title</button>
             <input type="text" sc-model="entry" />
             <span sc-text-bind="entry"></span>
           </div>
@@ -28,8 +28,8 @@
         <section sc-app="Counter" class="card">
           <div class="card-content">
             <span class="card-title" sc-text-bind="count"></span>
-            <button sc-click="increment">++</button>
-            <button sc-click="decrement">--</button>
+            <button class="waves-effect btn" sc-click="increment">++</button>
+            <button class="waves-effect btn" sc-click="decrement">--</button>
             <hr/>
             <span sc-show="count > 5">Woah, it's more than 5!</span>
           </div>

@@ -5,7 +5,7 @@ require 'opal-jquery'
 class Class
   def silica_binding(attr)
     raise "' is a forbidden character in Silica variables (#{attr})" if attr.include? "'"
-    self.class_eval "def #{attr};@_silica_#{attr};end"
+    self.class_eval "def #{attr};Silica.notify_read(#{self}, self, '#{attr}');@_silica_#{attr};end"
     self.class_eval "def #{attr}=(val);@_silica_#{attr}=val;Silica.notify(#{self}, self, '#{attr}');end"
   end
 end
@@ -18,11 +18,10 @@ class Silica
     Silica.new.init
   end
 
-  @@subscribed = {}
-  @@dependency = []
+  @@subscribed   = {}
+  @@dependencies = nil
 
   def self.notify(clazz, instance, attr) 
-    @@dependency.push 
     if @@subscribed.has_key? clazz.to_s
       if @@subscribed[clazz.to_s].has_key? attr
         @@subscribed[clazz.to_s][attr].each do |block|
@@ -32,10 +31,24 @@ class Silica
     end
   end
 
+  def self.notify_read(clazz, instance, attr)
+    return if @@dependencies.nil?
+    @@dependencies << { :class => clazz, :attribute => attr }
+  end
+
   def self.subscribe(className, attr, &callback)    
-    @@subscribed[className] = {} unless @@subscribed.has_key? className
+    @@subscribed[className] = {}       unless @@subscribed.has_key? className
     @@subscribed[className][attr] = [] unless @@subscribed[className].has_key? attr
     @@subscribed[className][attr].push callback;
+  end
+
+  def self.monitor_dependencies(&block)
+    old_dependencies = @@dependencies
+    @@dependencies = []
+    block.call
+    dependencies = @@dependencies
+    @@dependencies = old_dependencies
+    return dependencies
   end
 
   def init
@@ -65,8 +78,14 @@ class Silica
       app.init
 
       (findElements element, "show").each do |found|
+        puts ":)"
         # Calculate dependencies
-        app.instance_eval found[:value]
+        dependencies = Silica.monitor_dependencies do
+          puts "Monitor dependencies"
+          app.instance_eval found[:value]
+        end
+        
+        puts dependencies
       end
 
       Events.each do |event|

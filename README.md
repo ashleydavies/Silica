@@ -42,3 +42,13 @@ sc-on-click
 silica-click
 silica-on-click
 ```
+
+You can also use attributes such as `sc-show` to conditionally display or hide elements:
+
+```
+<div sc-show="count > 2">
+  More than 2!
+</div>
+```
+
+Variables are resolved respective to your application class. *Only* variables which have had silica_binding declared for them will result in automatic updates to any conditional behaviour dependent on them. Conditional behaviour is based on a dependency graph generated during the previous calculation of the property, so refreshing these conditions is fairly performant complexity-wise.

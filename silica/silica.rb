@@ -4,9 +4,26 @@ require 'opal-jquery'
 
 class Class
   def silica_binding(attr)
-    raise "' is a forbidden character in Silica variables (#{attr})" if attr.include? "'"
-    self.class_eval "def #{attr};Silica.notify_read(#{self}, self, '#{attr}');@_silica_#{attr};end"
-    self.class_eval "def #{attr}=(val);@_silica_#{attr}=val;Silica.notify(#{self}, self, '#{attr}');end"
+    define_method(attr) do
+      Silica.notify_read(self.class, self, attr)
+      instance_variable_get("@_silica_#{attr}")
+    end
+
+    define_method("#{attr}=") do |val|
+      instance_variable_set("@_silica_#{attr}", val)
+      Silica.notify(self.class, self, attr)
+    end
+  end
+
+  def silica_dynamic(attr, &block)
+    @@silica_eval_functions = {} if @silica_eval_functions.nil?
+    @@silica_eval_functions[attr] = block
+
+    define_method(attr) {
+      Silica.notify_read(self.class, self, attr.to_s)
+      self.send "silica_calc_#{attr}"
+    }
+    define_method "silica_calc_#{attr}", block
   end
 end
 

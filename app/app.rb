@@ -7,7 +7,6 @@ class BasicDemo
   def init
     self.title = "Initial title"
     self.entry = "Eggs"
-    puts "Initialized test app"
   end
   
   def buttonClick

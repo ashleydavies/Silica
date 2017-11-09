@@ -64,6 +64,8 @@ class Silica
       app_name = found[:value]
       app = (Object.const_get (app_name)).new
 
+      app.init
+
       findElements(element, 'text-bind').each do |found|
         Silica.subscribe(app_name, found[:value]) do |t|
           found[:element].text = app.send found[:value]
@@ -82,9 +84,7 @@ class Silica
         end
       end
 
-      app.init
-
-      (findElements element, "show").each do |found|
+      findElements(element, "show").each do |found|
         subscribeTo app, found do |show|
           found[:element].css 'display', show ? '' : 'none'
         end
@@ -96,6 +96,12 @@ class Silica
             app.send(found[:element].attr found[:attribute])
           end
         end
+      end
+    end
+
+    @@subscribed.each_pair do |_, attributes| 
+      attributes.each_pair do |_, methods|
+        methods.each(&:call)
       end
     end
   end

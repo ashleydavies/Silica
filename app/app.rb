@@ -20,6 +20,9 @@ end
 
 class Counter
   silica_binding :count
+  silica_dynamic :dblCount do
+    self.count * 2
+  end
 
   def init
     self.count = 0

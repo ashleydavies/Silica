@@ -85,6 +85,7 @@ class Silica
 
       findElements(element, 'text-bind').each do |found|
         Silica.subscribe(app_name, found[:value]) do |t|
+          puts "Updating text for #{found[:element].html}"
           found[:element].text = app.send found[:value]
         end
       end

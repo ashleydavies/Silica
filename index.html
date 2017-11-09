@@ -31,7 +31,7 @@
             <button class="waves-effect btn" sc-click="increment">++</button>
             <button class="waves-effect btn" sc-click="decrement">--</button>
             <hr/>
-            <span sc-show="count > 2">Woah, it's more than 2!</span>
+            <span sc-show="count > 2">Woah, it's <span sc-show="count > 5">loads</span> more than 2! (it's half of <span sc-text-bind="dblCount"></span>)</span>
           </div>
         </section>
       </div>

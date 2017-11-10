@@ -52,3 +52,31 @@ You can also use attributes such as `sc-show` to conditionally display or hide e
 ```
 
 Variables are resolved respective to your application class. *Only* variables which have had silica_binding declared for them will result in automatic updates to any conditional behaviour dependent on them. Conditional behaviour is based on a dependency graph generated during the previous calculation of the property, so refreshing these conditions is fairly performant complexity-wise.
+
+If you have properties which are more complicated, you can express this with silica_dynamic:
+
+```
+<!-- in a Ruby file -->
+class Complicated
+  silica_binding :forename
+  silica_binding :surname
+  silica_dynamic :fullName do
+    self.forename + self.surname
+  end
+
+  def init
+    self.forename = self.surname = ""
+  end
+end
+
+<!-- in HTML -->
+<div sc-app="Complicated">
+  Forename: <input type="text" sc-model="forename"></input>
+  <br/>
+  Surname: <input type="text" sc-model="surname"></input>
+  <br/>
+  Full name: <span sc-text-bind="fullName"/>
+</div>
+```
+
+Properties declared with silica_dynamic will be automatically recalculated henever any of their silica bound (whether through silica_dynamic or silica_binding) variables change, and will cause any appropriate UI changes to take place.

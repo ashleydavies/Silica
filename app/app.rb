@@ -76,6 +76,20 @@ class AdvancedComputable
     self.c -= 1
   end
 end
+
+class Names
+  silica_binding :forename
+  silica_binding :surname
+  silica_dynamic :fullName do
+    "#{self.forename} #{self.surname}"
+  end
+
+  def init
+    self.forename = ""
+    self.surname  = ""
+  end
+end
+
 # Start silica
 Silica.start
 

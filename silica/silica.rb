@@ -29,6 +29,7 @@ class Class
     end
 
     define_method "silica_calc_#{attr}" do |skip = false|
+      puts "Recalculating #{attr}"
       val = nil
       subscribedTo = []
       
@@ -47,10 +48,7 @@ class Class
           :callback => Silica.subscribe(dependency[:class].to_s, dependency[:attribute]) do
             -> {
               subscribedTo.each do |subscription|
-                puts @@subscribed[subscription[:class].to_s][subscription[:attribute]]
-                puts subscription[:callback]
                 @@subscribed[subscription[:class].to_s][subscription[:attribute]] -= [subscription[:callback]]
-                puts @@subscribed[subscription[:class].to_s][subscription[:attribute]]
               end
 
               self.send "silica_calc_#{attr}"

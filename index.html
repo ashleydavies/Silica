@@ -31,7 +31,27 @@
             <button class="waves-effect btn" sc-click="increment">++</button>
             <button class="waves-effect btn" sc-click="decrement">--</button>
             <hr/>
-            <span sc-show="count > 2">Woah, it's <span sc-show="count > 5">loads</span> more than 2! (it's half of <span sc-text-bind="dblCount"></span>)</span>
+            <span sc-show="count > 2">Woah, it's <span sc-show="count > 5">loads</span> more than 2! (half of <span sc-text-bind="dblCount"></span>)</span>
+          </div>
+        </section>
+      </div>
+      <div class="col s6">
+        <section sc-app="AdvancedComputable" class="card">
+          <div class="card-content">
+            <h3>Avg: <span sc-text-bind="avg"/></h3>
+            <h3>Sum: <span sc-text-bind="sum"/></h3>
+            <h3>A <span sc-text-bind="a"></span></h3>
+            <button class="waves-effect btn" sc-click="inc_a">++</button>
+            <button class="waves-effect btn" sc-click="dec_a">--</button>
+            <hr/>
+            <h3>B <span sc-text-bind="b"></span></h3>
+            <button class="waves-effect btn" sc-click="inc_b">++</button>
+            <button class="waves-effect btn" sc-click="dec_b">--</button>
+            <hr/>
+            <h3>C <span sc-text-bind="c"></span></h3>
+            <button class="waves-effect btn" sc-click="inc_c">++</button>
+            <button class="waves-effect btn" sc-click="dec_c">--</button>
+            <hr/>
           </div>
         </section>
       </div>

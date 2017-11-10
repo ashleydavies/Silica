@@ -19,11 +19,48 @@ class Class
     @@silica_eval_functions = {} if @silica_eval_functions.nil?
     @@silica_eval_functions[attr] = block
 
-    define_method(attr) {
+    define_method(attr) do
       Silica.notify_read(self.class, self, attr.to_s)
-      self.send "silica_calc_#{attr}"
-    }
-    define_method "silica_calc_#{attr}", block
+      
+      self.send "silica_calc_#{attr}", true if
+        instance_variable_get("@_silica_#{attr}").nil?
+
+      instance_variable_get("@_silica_#{attr}")
+    end
+
+    define_method "silica_calc_#{attr}" do |skip = false|
+      val = nil
+      subscribedTo = []
+      
+      dependencies = Silica.monitor_dependencies do
+        val = self.send "silica_calc_inner_#{attr}"
+      end
+      
+      instance_variable_set("@_silica_#{attr}", val)
+
+      Silica.notify(self.class, self, attr) unless skip
+
+      dependencies.each do |dependency|
+        subscribedTo << {
+          :class => dependency[:class],
+          :attribute => dependency[:attribute],
+          :callback => Silica.subscribe(dependency[:class].to_s, dependency[:attribute]) do
+            -> {
+              subscribedTo.each do |subscription|
+                puts @@subscribed[subscription[:class].to_s][subscription[:attribute]]
+                puts subscription[:callback]
+                @@subscribed[subscription[:class].to_s][subscription[:attribute]] -= [subscription[:callback]]
+                puts @@subscribed[subscription[:class].to_s][subscription[:attribute]]
+              end
+
+              self.send "silica_calc_#{attr}"
+            }
+          end
+        }
+      end
+    end
+
+    define_method "silica_calc_inner_#{attr}", block
   end
 end
 

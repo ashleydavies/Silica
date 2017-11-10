@@ -6,6 +6,7 @@ It is inspired heavily by Angular 1.0.
 Example code:
 
 index.html:
+
 ```
 <div silica-app="AppClass">
   <h1 sc-text-bind="count"></h1>
@@ -51,9 +52,9 @@ You can also use attributes such as `sc-show` to conditionally display or hide e
 </div>
 ```
 
-Variables are resolved respective to your application class. *Only* variables which have had silica_binding declared for them will result in automatic updates to any conditional behaviour dependent on them. Conditional behaviour is based on a dependency graph generated during the previous calculation of the property, so refreshing these conditions is fairly performant complexity-wise.
+Variables are resolved respective to your application class. *Only* variables which have had `silica_binding` called for them will result in automatic updates to any conditional behaviour dependent on them. Conditional behaviour is based on a dependency graph generated during the previous calculation of the property, so refreshing these conditions is fairly performant complexity-wise.
 
-If you have properties which are more complicated, you can express this with silica_dynamic:
+If you have properties which are more complicated, you can express this with `silica_dynamic`:
 
 ```
 <!-- in a Ruby file -->
@@ -79,4 +80,4 @@ end
 </div>
 ```
 
-Properties declared with silica_dynamic will be automatically recalculated henever any of their silica bound (whether through silica_dynamic or silica_binding) variables change, and will cause any appropriate UI changes to take place.
+Properties declared with `silica_dynamic` will be automatically recalculated whenever any of their silica bound (whether through `silica_dynamic` or `silica_binding`) variables change, and will cause any appropriate UI changes to take place.

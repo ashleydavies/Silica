@@ -51,7 +51,6 @@ class Silica
     end
 
     queue.each(&:call)
-    queue.clear
   end
 
   def self.notify_read(clazz, instance, attr)
@@ -72,7 +71,7 @@ class Silica
     block.call
     dependencies = @@dependencies
     @@dependencies = old_dependencies
-    return dependencies
+    return dependencies.uniq
   end
 
   def init
@@ -83,18 +82,23 @@ class Silica
 
       app.init
 
+      # Bind up text bindings
       findElements(element, 'text-bind').each do |found|
         Silica.subscribe(app_name, found[:value]) do |t|
-          puts "Updating text for #{found[:element].html}"
           found[:element].text = app.send found[:value]
         end
       end
 
+      # Bind up two-way data bound models
       findElements(element, 'model').each do |found|
         lastValue = nil
+
+        # Subscribe to changes to dependents for output directional binding
         Silica.subscribe(app_name, found[:value]) do |t|
           found[:element].value = app.send found[:value]
         end
+
+        # Hook up input for input directional binding
         found[:element].on :input do
           return if lastValue == found[:element].value
           app.send "#{found[:value]}=", found[:element].value
@@ -102,14 +106,16 @@ class Silica
         end
       end
 
+      # Bind up hide/show elements
       findElements(element, "show").each do |found|
         subscribeTo app, found do |show|
           found[:element].css 'display', show ? '' : 'none'
         end
       end
 
+      # Bind up events
       Events.each do |event|
-        (findElements element, [event, "on-#{event}"]).each do |found|
+        findElements(element, [event, "on-#{event}"]).each do |found|
           found[:element].on event do
             app.send(found[:element].attr found[:attribute])
           end
@@ -122,8 +128,10 @@ class Silica
         methods.each(&:call)
       end
     end
+
+    puts @@subscribed
   end
-  
+
   def subscribeTo(app, elemFound, &block)
     subscribedTo = []
     result = nil
